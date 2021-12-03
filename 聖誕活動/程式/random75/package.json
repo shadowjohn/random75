@@ -1,0 +1,13 @@
+{
+  "name": "nw-demo",
+  "main": "index.html",
+  "window": {
+    "show_in_taskbar" : false,
+    "toolbar": false,
+    "position": "center",
+    "resizable": true,
+    "fullscreen": true,
+    "width": 800,
+    "height": 800
+  }
+}

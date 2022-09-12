@@ -2,12 +2,15 @@
   "name": "nw-demo",
   "main": "index.html",
   "window": {
-    "show_in_taskbar" : false,
+    "show_in_taskbar": true,
     "toolbar": false,
     "position": "center",
     "resizable": true,
-    "fullscreen": true,
+    "fullscreen": false,
     "width": 800,
     "height": 800
+  },
+  "dependencies": {
+    "read-excel-file": "^5.4.7"
   }
 }

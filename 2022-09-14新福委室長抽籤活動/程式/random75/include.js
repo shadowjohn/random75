@@ -966,7 +966,7 @@ function mytabs(dom, obj) {
         dom.find("> ul li a").eq(0).trigger("click");
     }
 }
-function dialogMyBoxOn(message, isTouchOutSideClose, functionAction) {
+function dialogMyBoxOn(message, isTouchOutSideClose, functionAction, unBlockFunction) {
     $.mybox({
         is_background_touch_close: isTouchOutSideClose,
         message: message,
@@ -978,6 +978,11 @@ function dialogMyBoxOn(message, isTouchOutSideClose, functionAction) {
         },
         onBlock: function () {
             functionAction();
+        },
+        unBlock: function () {
+            if (typeof (unBlockFunction) == "function") {
+                unBlockFunction();
+            }
         }
     });
 }
@@ -1010,7 +1015,7 @@ function timedownbutton(button_dom, title, seconds, done_func) {
             parseInt($(button_dom).attr('timedown')) +
             ")"
         );
-        setTimeout(function () {
+        window['time_down_func_'+t+'_timeout'] = setTimeout(function () {
             if (parseInt($(button_dom).attr('timedown')) > 0) {
                 $(button_dom).attr('timedown', parseInt($(button_dom).attr('timedown')) - 1);
                 window['time_down_func_' + t]();
@@ -1022,4 +1027,5 @@ function timedownbutton(button_dom, title, seconds, done_func) {
     }
 
     window['time_down_func_' + t]();
+    return t;
 }

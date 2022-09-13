@@ -147,6 +147,8 @@
                 // 按下抽
                 // 名單從 textarea #memberTextarea 取得，移除所有 \n，用 , 分格，打亂 array，作抽獎效果
                 $("#runBtn").unbind("click").click({ kind_index: kind_index }, function (e) {
+                    clearInterval(window['runInterval']);
+                    clearTimeout(window['time_down_func_' + window['tButtonInterval'] + '_timeout']);
                     window['lastKindIndex'] = e.data.kind_index;
                     var membersArr = $("#memberTextarea").val().replace("\n", "").split(",");
                     membersArr = shuffle(membersArr); //打亂
@@ -158,21 +160,28 @@
                     var html = implode("", m);
                     html += "<input type='button' style='position:absolute;right:30px;bottom:30px;' id='timedownBtn'>";
                     dialogMyBoxOn(html, true, function () {
+                        //加個 min width、min height
+                        $("div[id^='mybox_div']").css({
+                            'min-width': '400px',
+                            'min-height': '400px'
+                        });
                         window['runInterval'] = setInterval(function () {
+                            // 隨機人名框選開始作動
                             $(".randomDivs").removeClass("focusRandom");
                             $(".randomDivs").eq(rand(0, $(".randomDivs").length - 1)).addClass("focusRandom");
                         }, 30);
 
                         //timedownbutton(button_dom, title, seconds, done_func) {
                         //倒數計時關閉按鈕
-                        timedownbutton("#timedownBtn", "倒數中", 8, function () {
+                        window['tButtonInterval'] = timedownbutton("#timedownBtn", "倒數中", 8, function () {
                             //時間到
-                            clearTimeout(window['runInterval']);
+                            clearInterval(window['runInterval']);
                             setTimeout(function () {
                                 //把贏的抓出來，全螢幕
                                 window['winName'] = $(".focusRandom").text();
                                 var html = "<div class='winNameClass'>" + window['winName'] + "</div>";
                                 dialogMyBoxOn(html, true, function () {
+                                    // 光箱出現後
                                     $("div[id^='mybox_div']").css({
                                         'background-color': 'transparent',
                                         'padding': '60px',
@@ -187,6 +196,10 @@
                                 });
                             }, 500);
                         });
+                    }, function () {
+                        //如果臨時點旁邊關掉光箱    
+                        clearTimeout(window['time_down_func_' + window['tButtonInterval'] + '_timeout']);
+                        clearInterval(window['runInterval']);
                     });
                 });
 

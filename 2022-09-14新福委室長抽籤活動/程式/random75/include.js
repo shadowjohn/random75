@@ -1029,3 +1029,27 @@ function timedownbutton(button_dom, title, seconds, done_func) {
     window['time_down_func_' + t]();
     return t;
 }
+
+function focus_border(dom) {
+    var w = dom.width();
+    var h = dom.height();
+    if ($("#focus_border_css").length == 0) {
+        $("body").append("<div id='focus_border_css'> \
+                                       <style> \
+                                          @-webkit-keyframes bounce { \
+                                                 0%{ box-shadow: 0 0 0 4px #999999; \
+                                                 opacity:1; \
+                                           } \
+                                          25%{ ox-shadow: 0 0 0 1px #999999; opacity:1;} \
+                                          50%{ box-shadow: 0 0 0 7px #999999; opacity:1; } \
+                                          75%{ box-shadow: 0 0 0  4px #999999; opacity:1;}  \
+                                         100%{ box-shadow: 0 0 0 5px #999999; opacity:1;} \
+                                       </style></div>");
+
+    }
+    dom.css({
+        'box-shadow': '0 0 0 5px #999999',
+        'border-radius': w + 'px',
+        '-webkit-animation': 'bounce 0.4s infinite linear'
+    });
+}

@@ -9,9 +9,10 @@
     <link href="jquery-ui-1.8.24/themes/base/jquery.ui.all.css" rel="stylesheet" type="text/css">
     <script language="javascript" src="mybox.js"></script>
     <script language="javascript" src="include.js"></script>
+    <script language="javascript" src="fireworks.umd.js"></script>
     <title>2022年福委室長抽籤活動</title>
     <style>
-        html, body {
+        /* html, body {
             width: 100%;
             height: 100%;
             overflow: hidden;
@@ -19,39 +20,39 @@
             margin: 0px;
             font-size: 2.5em;
             font-family: "微軟正黑體";
-        }
+        } */
 
-        * {
+        /* * {
             font-size: 1em;
             font-family: "微軟正黑體";
-        }
-
+        } */
+/* 
         #step2 {
             font-size: 0.5em;
-        }
+        } */
 
-        .focus {
+        /* .focus {
             border: 2px solid #00b;
             font-weight: bold;
             color: blue;
-        }
+        } */
 
         /* 抽獎時，隨時跳的樣式 */
-        .focusRandom {
+        /* .focusRandom {
             border: 2px solid #00b;
             font-weight: bold;
             color: #0026ff;
             background-color: #eef;
-        }
+        } */
 
 
-        .memberTextareaClass {
+        /* .memberTextareaClass {
             font-size: 0.7em;
             overflow: visible;
             min-height: 600px;
-        }
+        } */
 
-        .randomDivs {
+        /* .randomDivs {
             float: left;
             margin-right: 20px;
             border: 1px solid #000;
@@ -66,18 +67,51 @@
             font-weight: bold;
             border: 2px solid orange;
             padding: 28px 16px 28px 16px;
-        }
+        } */
     </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bootstrap-grid.min.css">
+    <link rel="stylesheet" type="text/css" href="csshake.min.css">
 </head>
 <body>
-    <div align="right"><input type="button" value="Reload" onclick="location.reload();" style="font-size:12px;" /></div>
-    <div id="step1">
-        步驟一：請開啟名單 <input type="button" id="inputBtn" value="請選檔案" /><input type="file" id="input" style="display:none;" />
+    <div class="column h-100">
+        <div class="toolbox scrollbar flex-shrink-0">
+            <div id="stepName" class="toolbox__step-name">Step1.</div>
+            <div id="step2" class="toolbox__inner scrollbar space-x" style="display:none;"></div>
+            <input type="button" class="btn btn--reload ml-auto" value="Reload" onclick="location.reload();"/>            
+        </div>
+        <main class="main flex-1 scrollbar">
+            <div id="step1" class="step-1">
+                <div>
+                    <div class="scpace"></div>
+                    <input type="button" id="inputBtn" class="btn" value="請選擇人員名單" />
+                    <input type="file" id="input" style="display:none;" />
+                </div>
+            </div>
+                
+            <div id="openner" class="h-100" hidden>
+                <div class="flex justify-center items-center h-100">
+                    <span class="text-center text-blod">😈要抽什麼</span>
+                </div>
+            </div>
+            <div id="step3" class="step-3" style="display:none;"></div>
+        </main>
     </div>
-    <div id="step2" style="display:none;"></div>
-    <div id="step3" style="display:none;"></div>
 </body>
 <script>
+    const FireworksClass = Fireworks.default
+    const $openner = $('#openner');
+    function colShake$DOM() {
+        return $('<div class="col-auto"></div>')
+    }
+    function personBadge$DOM(name, isPass) {
+        const emoji = isPass ? 'badge--person-pass' : 'badge--person-startle'
+        return $(`<span class="badge badge--person ${emoji}">${name}</span>`)
+    }
+    function setStepName(num) {
+        const el = document.getElementById('stepName')
+        el.textContent = 'Step' + num + '.'
+    }
     $("#inputBtn").unbind("click").click(function () {
         $("#input").trigger("click");
     });
@@ -102,30 +136,31 @@
             $("#step1").hide();
             var html = new Array();
             for (var i = 1; i < sheetNames.length; i++) {
-                var d = "<input type=\"button\" reqc=\"sheetNames\" req_id=\"" + i + "\" orin_value=\"抽" + sheetNames[i].name + "\" value=\"抽" + sheetNames[i].name + "\">";
+                var d = "<input type=\"button\" class=\"btn btn--sm btn--nav\" reqc=\"sheetNames\" req_id=\"" + i + "\" orin_value=\"抽" + sheetNames[i].name + "\" value=\"抽" + sheetNames[i].name + "\">";
                 html.push(d);
             }
             $("#step2").show();
-            $("#step2").html("<center>" + html.join("&nbsp;") + "</center><hr color='red'>");
+            setStepName(2)
+            $openner.show()
+            // $("#step2").html("<center>" + html.join("&nbsp;") + "</center><hr color='red'>");
+            $("#step2").html(html)
             //按到 要抽哪一種
             $("input[reqc='sheetNames']").unbind("click").click(function () {
+                $openner.hide()
                 $("input[reqc='sheetNames']").removeClass("focus");
                 var kind_index = $(this).attr('req_id');
                 $(this).addClass("focus");
                 $("#step3").empty();
                 var html = "";
                 html += `
-                <table style='width:100%;'>
-                    <tr>
-                        <td style='width:95%;'>
-                            <p style='font-size:0.7em;line-height:0.7em;padding:10px;margin:0px;'>名單確認：</p>
-                            <textarea id='memberTextarea' style='width:100%;' class='memberTextareaClass'>{members}</textarea>
-                        </td>
-                        <td valign="center">
-                            <input type='button' id='runBtn' value='抽!!!'>
-                        </td>
-                    </tr>
-                </table>`;
+                    <div>
+                        <div class="scpace-b">😈名單確認</div>
+                        <div id="personBlock" class="row g-2"></div>
+                        <!--<textarea id='memberTextarea' class="texttarea scrollbar" no>{members}</textarea>-->
+                    </div>
+                    <div class="scpace-t">
+                        <input type='button' id='runBtn' class="btn btn--run  shake" value='抽🔥'>
+                    </div>`;
 
                 //console.log(input.files[0]);
                 //console.log(kind_index);
@@ -140,8 +175,11 @@
                     }
                     step++;
                 }
-                html = html.replace("{members}", implode(",", names));
+                // html = html.replace("{members}", implode(",", names.map(name => ('💩' + name))));
                 $("#step3").html(html).fadeIn();
+                const personsEls = names.map(name => (colShake$DOM().append(personBadge$DOM(name))))
+                $('#personBlock').append(personsEls)
+                $('#personBlock').data({persons: names})
 
 
                 // 按下抽
@@ -150,15 +188,18 @@
                     clearInterval(window['runInterval']);
                     clearTimeout(window['time_down_func_' + window['tButtonInterval'] + '_timeout']);
                     window['lastKindIndex'] = e.data.kind_index;
-                    var membersArr = $("#memberTextarea").val().replace("\n", "").split(",");
+                    // var membersArr = $("#memberTextarea").val().replace("\n", "").split(",");
+                    var membersArr = $('#personBlock').data().persons;
                     membersArr = shuffle(membersArr); //打亂
                     var m = new Array();
                     for (var i = 0, max_i = membersArr.length; i < max_i; i++) {
-                        var d = "<div class='randomDivs'>" + membersArr[i] + "</div>";
+                        // var d = "<div class='randomDivs'>" + membersArr[i] + "</div>";
+                        var d = `<div class="col-auto"><span class="randomDivs badge badge--person-startle">${membersArr[i]}</span></div>`
                         m.push(d);
                     }
-                    var html = implode("", m);
-                    html += "<input type='button' style='position:absolute;right:30px;bottom:30px;' id='timedownBtn'>";
+                    // var html = implode("", m);
+                    var html = implode("", `<div class="row g-2">${m.join('')}</div>`);
+                    html += "<input type='button' class='btn' style='position:absolute;right:30px;bottom:30px;' id='timedownBtn'>";
                     dialogMyBoxOn(html, true, function () {
                         //加個 min width、min height
                         $("div[id^='mybox_div']").css({
@@ -167,20 +208,60 @@
                         });
                         window['runInterval'] = setInterval(function () {
                             // 隨機人名框選開始作動
-                            $(".randomDivs").removeClass("focusRandom");
-                            $(".randomDivs").eq(rand(0, $(".randomDivs").length - 1)).addClass("focusRandom");
+                            // $(".randomDivs").removeClass("focusRandom");
+                            $(".randomDivs").removeClass("badge--focus");
+                            // $(".randomDivs").eq(rand(0, $(".randomDivs").length - 1)).addClass("focusRandom");
+                            $(".randomDivs").eq(rand(0, $(".randomDivs").length - 1)).addClass("badge--focus");
                         }, 30);
 
                         //timedownbutton(button_dom, title, seconds, done_func) {
                         //倒數計時關閉按鈕
-                        window['tButtonInterval'] = timedownbutton("#timedownBtn", "倒數中", 8, function () {
+                        window['tButtonInterval'] = timedownbutton("#timedownBtn", "倒數中", 0, function () {
                             //時間到
                             clearInterval(window['runInterval']);
                             setTimeout(function () {
                                 //把贏的抓出來，全螢幕
-                                window['winName'] = $(".focusRandom").text();
-                                var html = "<div class='winNameClass'>" + window['winName'] + "</div>";
+                                // window['winName'] = $(".focusRandom").text();
+                                window['winName'] = $(".badge--focus").text();
+                                var html = "<div class='badge badge--person-shit badge--xl badge--shadow rotate-6'>" + window['winName'] + "</div>";
                                 dialogMyBoxOn(html, true, function () {
+                                    // 背景
+                                    const $mybox_background = $("div[id^='mybox_background']")
+
+                                    $mybox_background.css({
+                                        'background-color': 'rgba(0,0,0,.95)',
+                                        'opacity': 1
+                                    })
+                                    // 背景附加煙火特效
+                                    const fireworks = new FireworksClass(
+                                        $mybox_background.get(0),
+                                        {
+                                            delay: {
+                                                min: 10,
+                                                max: 15
+                                            },
+                                            opacity: .2,
+                                            sound: {
+                                                enabled: true,
+                                                files: ['explosion0.mp3', 'explosion1.mp3', 'explosion2.mp3'],
+                                                volume: {
+                                                    min: 50, max: 100
+                                                }
+                                            }
+                                        }
+                                    )
+                                    function fireworksRemove() {
+                                        // 停止煙火(如果沒有stop音效還會繼續播放)
+                                        fireworks.stop();
+                                        // 清除煙火實例
+                                        fireworks.clear();
+                                        
+                                    }
+                                    // 放煙火
+                                    fireworks.start();
+                                    // 背景click關閉清除煙火實例
+                                    $mybox_background.on('click', fireworksRemove)
+
                                     // 光箱出現後
                                     $("div[id^='mybox_div']").css({
                                         'background-color': 'transparent',
@@ -190,9 +271,11 @@
                                     setTimeout(function () {
                                         //把中獎名寫回
                                         var orin_value = $("input[reqc='sheetNames'][req_id='" + window['lastKindIndex'] + "']").attr('orin_value');
-                                        $("input[reqc='sheetNames'][req_id='" + window['lastKindIndex'] + "']").val(orin_value + "(" + window['winName'] + ")");
+                                        $("input[reqc='sheetNames'][req_id='" + window['lastKindIndex'] + "']").val(orin_value + "(" + "💩" + window['winName'] + ")");
+                                        fireworksRemove()
                                         dialogMyBoxOff();
-                                    }, 5000);
+                                        $mybox_background.off('click')
+                                    }, 6000);
                                 });
                             }, 500);
                         });

@@ -1,0 +1,263 @@
+:root {
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --hover-color: white;
+  --shit-color: #b45309;
+  --primary: #CC9544;
+  --light: white;
+  --dark: #202040; 
+  --radius-base: 1rem; 
+}
+* {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--gray-800);
+  
+  /* background: var(--gray-900);
+  background: linear-gradient(180deg, var(--gray-200) 0%, var(--gray-100) 50%, var(--gray-100) 100%); */
+  /* background-color: #fcd34d; */
+}
+
+body {
+  font-family: "Noto Sans TC", "SF Pro TC", "SF Pro Text", "SF Pro Icons", "PingFang TC", "Helvetica Neue", "Helvetica", "Arial", "Microsoft JhengHei", wf_SegoeUI, "Segoe UI",
+      Segoe, "Segoe WP", Tahoma, Verdana, Ubuntu, "Bitstream Vera Sans", "DejaVu Sans", 微軟正黑體, "LiHei Pro", "WenQuanYi Micro Hei", "Droid Sans Fallback",
+      "AR PL UMing TW", Roboto, "Hiragino Maru Gothic ProN", メイリオ, "ヒラギノ丸ゴ ProN W4", Meiryo, "Droid Sans", sans-serif;
+  overflow: hidden;
+  background-color: #EEEEEE;
+}
+
+.main {
+  padding: 2rem;
+  overflow-y: auto;
+}
+.btn {
+  font-family: inherit;
+  padding: .5rem 1.25rem;
+  font-size: 1.75rem;
+  border: none;
+  background-color: var(--gray-900);
+  color: var(--light);
+  border-radius: var(--radius-base);
+  vertical-align: middle;
+  line-height: 1;
+  transition: background-color .15s ease;
+  cursor: pointer;
+}
+.btn--run {
+  background-color: #7c2d12;
+  color: var(--light);
+  font-weight: bold;
+  min-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.btn--sm {
+  font-size: 1.25rem;
+}
+
+.btn:hover {
+  color: var(--hover-color);
+  background-color: var(--dark);
+}
+.btn--nav {
+  padding: .5rem;
+  font-size: 1rem;
+}
+.btn--nav:hover {
+  color: var(--dark);
+  background-color: var(--primary);
+}
+.btn--run:hover {
+  background-color: var(--shit-color)
+}
+.btn--reload {
+  font-size: .8rem;
+}
+.btn--reload:hover {
+  background-color: var(--gray-800);
+  transition: background-color .5s ease;
+}
+
+/* .nav-item {
+  padding: .5rem;
+  font-size: 1rem;
+} */
+
+.toolbox {
+  padding: .75rem;
+  background-color: var(--gray-900);
+  overflow-x: auto;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.toolbox__inner {
+  margin-left: 1rem;
+  display: flex;
+  flex: 1 1 auto;
+  overflow-x: auto;
+}
+.toolbox__step-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+
+
+
+.badge {
+  font-size: 2rem;
+  font-weight: bold;
+  background-color: var(--dark);
+  color: var(--light);
+  padding: .5rem .75rem;
+  border-radius: var(--radius-base);
+  display: inline-block;
+  white-space:nowrap;
+  text-align: center;
+  vertical-align: middle;
+}
+.badge--lg {
+  font-size: 1.8rem;
+}
+.badge--xl {
+  font-size: 6.5rem;
+  padding: 1rem 1.75rem;
+}
+.badge--focus {
+  background-color: var(--shit-color);
+}
+.badge--person-shit {
+  background-color: var(--light);
+  color: var(--dark);  
+}
+.badge--person-shit::before {
+  content: '💩';
+  display: inline-block;
+}
+.badge--person-startle::before {
+  content: '😱';
+  display: inline-block;
+}
+.badge--person-pass::before {
+  content: '😆';
+  display: inline-block;
+}
+
+.badge--shadow {
+  box-shadow: 12px 12px 18px rgba(0,0,0, .5);
+}
+
+
+/* scrollbar */
+.scrollbar::-webkit-scrollbar {
+		background-color: transparent;
+		width: 8px;
+		height: 8px;
+	}
+
+.scrollbar::-webkit-scrollbar-track {
+		background-color: transparent;
+	}
+
+.scrollbar::-webkit-scrollbar-thumb {
+		background-color: var(--gray-500);
+		border-radius: 16px;
+	}
+
+.scrollbar::-webkit-scrollbar-button,
+.scrollbar::-webkit-scrollbar-corner {
+		display: none;
+}
+
+.step-1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.step-3 {
+  width: 100%;
+}
+
+.texttarea {
+  border-radius: var(--radius-base);
+  padding: .5rem 1rem;
+  width: 100%;
+  min-height: 300px;
+  resize: none;
+}
+
+
+ /* utils */
+.space-x > * + * {
+  margin-left: .5rem;
+}
+.scpace {
+  display: block;
+  margin: auto;
+}
+.scpace-b {
+  margin-bottom: 1rem;
+}
+
+.scpace-t {
+  margin-top: 1rem;
+}
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
+}
+
+.flex {
+  display: flex;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+.flex-shrink-0{
+  flex-shrink: 0;
+}
+.flex-auto {
+  flex: 1 1 auto;
+}
+.flex-1 {
+  flex: 1 1 0;
+}
+.justify-center {
+  justify-content: center;
+}
+.items-center {
+  align-items: center;
+}
+.ml-auto {
+  margin-left: auto;
+}
+.text-blod {
+  font-weight: bold;
+}
+.text-center {
+  text-align: center;
+}
+.rotate-6 {
+  transform: rotate(6deg);
+}

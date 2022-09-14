@@ -11,64 +11,6 @@
     <script language="javascript" src="include.js"></script>
     <script language="javascript" src="fireworks.umd.js"></script>
     <title>2022年福委室長抽籤活動</title>
-    <style>
-        /* html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            padding: 0px;
-            margin: 0px;
-            font-size: 2.5em;
-            font-family: "微軟正黑體";
-        } */
-
-        /* * {
-            font-size: 1em;
-            font-family: "微軟正黑體";
-        } */
-/* 
-        #step2 {
-            font-size: 0.5em;
-        } */
-
-        /* .focus {
-            border: 2px solid #00b;
-            font-weight: bold;
-            color: blue;
-        } */
-
-        /* 抽獎時，隨時跳的樣式 */
-        /* .focusRandom {
-            border: 2px solid #00b;
-            font-weight: bold;
-            color: #0026ff;
-            background-color: #eef;
-        } */
-
-
-        /* .memberTextareaClass {
-            font-size: 0.7em;
-            overflow: visible;
-            min-height: 600px;
-        } */
-
-        /* .randomDivs {
-            float: left;
-            margin-right: 20px;
-            border: 1px solid #000;
-            font-size: 1.2em;
-            padding: 8px 4px 8px 4px;
-        }
-
-        .winNameClass {
-            background-color: #fff;
-            font-size: 3.5em;
-            transform: rotate(6deg);
-            font-weight: bold;
-            border: 2px solid orange;
-            padding: 28px 16px 28px 16px;
-        } */
-    </style>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="bootstrap-grid.min.css">
     <link rel="stylesheet" type="text/css" href="csshake.min.css">
@@ -78,7 +20,7 @@
         <div class="toolbox scrollbar flex-shrink-0">
             <div id="stepName" class="toolbox__step-name">Step1.</div>
             <div id="step2" class="toolbox__inner scrollbar space-x" style="display:none;"></div>
-            <input type="button" class="btn btn--reload ml-auto" value="Reload" onclick="location.reload();"/>            
+            <input type="button" class="btn btn--reload ml-auto" value="Reload" onclick="location.reload();" />
         </div>
         <main class="main flex-1 scrollbar">
             <div id="step1" class="step-1">
@@ -88,7 +30,7 @@
                     <input type="file" id="input" style="display:none;" />
                 </div>
             </div>
-                
+
             <div id="openner" class="h-100" hidden>
                 <div class="flex justify-center items-center h-100">
                     <span class="text-center text-blod">😈要抽什麼</span>
@@ -99,14 +41,50 @@
     </div>
 </body>
 <script>
+    /* 允許捲動縮放 Start */
+    const win = nw.Window.get();
+
+    window.addEventListener('wheel', function (evt) {
+        if (evt.ctrlKey) {
+            if (evt.deltaY > 0) {
+                win.zoomLevel -= 0.5;
+            } else {
+                win.zoomLevel += 0.5;
+            }
+            // store zoom level to localStorage
+            localStorage.zoomLevel = win.zoomLevel;
+        }
+    });
+
+    // load zoom level from localStorage
+    if (localStorage.zoomLevel) {
+        win.zoomLevel = parseFloat(localStorage.zoomLevel);
+    }
+    /* 允許捲動縮放 End */
+
+    //pre load gif
+    window['gif_step'] = 0;
+    window['g_screm_gifs'] = new Array();
+    for (var i = 1; i <= 33; i++) {
+        var x = new Image();
+        x.src = "pic/screm/" + i + ".gif";
+        window['g_screm_gifs'].push("pic/screm/" + i + ".gif");
+    }
     const FireworksClass = Fireworks.default
     const $openner = $('#openner');
     function colShake$DOM() {
         return $('<div class="col-auto"></div>')
     }
     function personBadge$DOM(name, isPass) {
-        const emoji = isPass ? 'badge--person-pass' : 'badge--person-startle'
-        return $(`<span class="badge badge--person ${emoji}">${name}</span>`)
+        const emoji = isPass ? '' : 'badge--person-startle';
+        //badge--person-pass
+        // class="${emoji}"
+        window['gif_step']++;
+        window['gif_step'] %= 34;
+        window['gif_step'] = (window['gif_step'] == 0) ? 1 : window['gif_step'];
+        window['gif_step'] = (window['gif_step'] > 33) ? 33 : window['gif_step'];
+        var author_gif = "pic/screm/" + window['gif_step'] + ".gif";
+        return $(`<span class="badge badge--person"><span reqc="emoji_span" style='display: inline-block;width:80px;height:80px;background-image:url(` + author_gif + `);background-size:100% 100%;'></span>${name}</span>`)
     }
     function setStepName(num) {
         const el = document.getElementById('stepName')
@@ -177,10 +155,19 @@
                 }
                 // html = html.replace("{members}", implode(",", names.map(name => ('💩' + name))));
                 $("#step3").html(html).fadeIn();
-                const personsEls = names.map(name => (colShake$DOM().append(personBadge$DOM(name))))
-                $('#personBlock').append(personsEls)
-                $('#personBlock').data({persons: names})
 
+                const personsEls = names.map(function (name) {
+                    //console.log(colShake$DOM());
+                    //console.log(personBadge$DOM(name));
+                    var _data = colShake$DOM().append(personBadge$DOM(name));
+                    return _data;
+                })
+                $('#personBlock').append(personsEls)
+                $('#personBlock').data({ persons: names })
+
+
+                //抖動外框
+                focus_border($("span[reqc='emoji_span']"));
 
                 // 按下抽
                 // 名單從 textarea #memberTextarea 取得，移除所有 \n，用 , 分格，打亂 array，作抽獎效果
@@ -204,7 +191,7 @@
                         //加個 min width、min height
                         $("div[id^='mybox_div']").css({
                             'min-width': '400px',
-                            'min-height': '400px'
+                            'min-height': '600px'
                         });
                         window['runInterval'] = setInterval(function () {
                             // 隨機人名框選開始作動
@@ -216,7 +203,7 @@
 
                         //timedownbutton(button_dom, title, seconds, done_func) {
                         //倒數計時關閉按鈕
-                        window['tButtonInterval'] = timedownbutton("#timedownBtn", "倒數中", 0, function () {
+                        window['tButtonInterval'] = timedownbutton("#timedownBtn", "倒數中", 8, function () {
                             //時間到
                             clearInterval(window['runInterval']);
                             setTimeout(function () {
@@ -255,7 +242,7 @@
                                         fireworks.stop();
                                         // 清除煙火實例
                                         fireworks.clear();
-                                        
+
                                     }
                                     // 放煙火
                                     fireworks.start();
@@ -280,7 +267,7 @@
                             }, 500);
                         });
                     }, function () {
-                        //如果臨時點旁邊關掉光箱    
+                        //如果臨時點旁邊關掉光箱
                         clearTimeout(window['time_down_func_' + window['tButtonInterval'] + '_timeout']);
                         clearInterval(window['runInterval']);
                     });

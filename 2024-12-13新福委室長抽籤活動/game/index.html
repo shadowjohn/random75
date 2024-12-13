@@ -1,0 +1,293 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script language="javascript" src="js/jquery.min.js"></script>
+    <script language="javascript" src="js/jquery-migrate-3.4.0.min.js"></script>
+    <script language="javascript" src="js/php.js"></script>
+    <script src="js/jquery-ui-1.8.24/ui/minified/jquery-ui.min.js" type="text/javascript"></script>
+    <link href="js/jquery-ui-1.8.24/themes/base/minified/jquery-ui.min.css" rel="stylesheet" type="text/css">
+    <script language="javascript" src="js/mybox.js"></script>
+    <script language="javascript" src="js/include.js"></script>
+    <script language="javascript" src="js/fireworks/fireworks.umd.js"></script>
+    <script language="javascript" src="js/fireworks/mp3.js"></script>
+    <script language="javascript" src="js/xlsx/xlsx.full.min.js"></script>
+    <title>2024年福委室長抽籤活動</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
+    <link rel="stylesheet" type="text/css" href="css/csshake.min.css">
+</head>
+<body>
+    <div class="column h-100">
+        <div class="toolbox scrollbar flex-shrink-0">
+            <div id="stepName" class="toolbox__step-name">Step1.</div>
+            <div id="step2" class="toolbox__inner scrollbar space-x" style="display:none;"></div>
+            <input type="button" class="btn btn--reload ml-auto" value="Reload" onclick="location.reload();" />
+        </div>
+        <main class="main flex-1 scrollbar">
+            <div id="step1" class="step-1">
+                <div>
+                    <div class="scpace"></div>
+                    <input type="button" id="inputBtn" class="btn" value="請選擇人員名單" />
+                    <input type="file" id="input" style="display:none;" />
+                </div>
+            </div>
+
+            <div id="openner" class="h-100" hidden>
+                <div class="flex justify-center items-center h-100">
+                    <span class="text-center text-blod">😈要抽什麼</span>
+                </div>
+            </div>
+            <div id="step3" class="step-3" style="display:none;"></div>
+        </main>
+    </div>
+</body>
+<script>
+    /* 允許捲動縮放 Start */
+    window.addEventListener('wheel', function (evt) {
+        if (evt.ctrlKey) {
+            if (evt.deltaY > 0) {
+                win.zoomLevel -= 0.5;
+            } else {
+                win.zoomLevel += 0.5;
+            }
+            // store zoom level to localStorage
+            localStorage.zoomLevel = win.zoomLevel;
+        }
+    });
+
+    // load zoom level from localStorage
+    //if (localStorage.zoomLevel) {
+    //    win.zoomLevel = parseFloat(localStorage.zoomLevel);
+    //}
+    /* 允許捲動縮放 End */
+
+    //pre load gif
+    window['gif_step'] = 0;
+    window['g_screm_gifs'] = new Array();
+    for (var i = 1; i <= 33; i++) {
+        var x = new Image();
+        x.src = "pic/screm/" + i + ".gif";
+        window['g_screm_gifs'].push("pic/screm/" + i + ".gif");
+    }
+    const FireworksClass = Fireworks.default
+    const $openner = $('#openner');
+    function colShake$DOM() {
+        return $('<div class="col-auto"></div>')
+    }
+    function personBadge$DOM(name, isPass) {
+        const emoji = isPass ? '' : 'badge--person-startle';
+        //badge--person-pass
+        // class="${emoji}"
+        window['gif_step']++;
+        window['gif_step'] %= 34;
+        window['gif_step'] = (window['gif_step'] == 0) ? 1 : window['gif_step'];
+        window['gif_step'] = (window['gif_step'] > 33) ? 33 : window['gif_step'];
+        var author_gif = "pic/screm/" + window['gif_step'] + ".gif";
+        return $(`<span class="badge badge--person"><span reqc="emoji_span" style='display: inline-block;width:80px;height:80px;background-image:url(` + author_gif + `);background-size:100% 100%;'></span>${name}</span>`)
+    }
+    function setStepName(num) {
+        const el = document.getElementById('stepName')
+        el.textContent = 'Step' + num + '.'
+    }
+    $("#inputBtn").unbind("click").click(function () {
+        $("#input").trigger("click");
+    });
+    // From : https://www.npmjs.com/package/read-excel-file
+
+    var input = document.getElementById('input');
+    window['gData'] = {};
+    input.addEventListener('change', function () {
+        const f = input.files[0];
+        const reader = new FileReader();
+        reader.readAsBinaryString(f);
+        reader.onload = (e) => {
+            const data = e.target.result;
+            const zzexcel = XLSX.read(data, { type: 'binary' });
+            console.log(zzexcel);
+            const result = [];
+            zzexcel.SheetNames.forEach((name) => {
+                const sheet = zzexcel.Sheets[name];
+                const sheetData = XLSX.utils.sheet_to_json(sheet);
+                result.push({ name, sheetData });
+                window['gData'][name] = sheetData;
+            });
+            var sheetNames = [];
+            for (var n in window['gData']) {
+                if (n != "員工進階資料") {
+                    sheetNames.push({ "name": n });
+                }
+            }
+            console.log(sheetNames);
+            //alert(print_r(sheetNames, true));
+            $("#step1").hide();
+            var html = new Array();
+            for (var i = 0; i < sheetNames.length; i++) {
+                var d = "<input type=\"button\" class=\"btn btn--sm btn--nav\" reqc=\"sheetNames\" req_sheetname=\"" + sheetNames[i].name + "\" req_id=\"" + i + "\" orin_value=\"抽" + sheetNames[i].name + "\" value=\"抽" + sheetNames[i].name + "\">";
+                html.push(d);
+            }
+            $("#step2").show();
+            setStepName(2)
+            $openner.show()
+            // $("#step2").html("<center>" + html.join("&nbsp;") + "</center><hr color='red'>");
+            $("#step2").html(html)
+            //按到 要抽哪一種
+            $("input[reqc='sheetNames']").unbind("click").click(function () {
+                $openner.hide()
+                $("input[reqc='sheetNames']").removeClass("focus");
+                //var kind_index = $(this).attr('req_id');
+                var kind_name = $(this).attr('req_sheetname');
+                $(this).addClass("focus");
+                $("#step3").empty();
+                var html = "";
+                html += `
+        <div>
+            <div class="scpace-b">😈名單確認</div>
+            <div id="personBlock" class="row g-2"></div>
+            <!--<textarea id='memberTextarea' class="texttarea scrollbar" no>{members}</textarea>-->
+        </div>
+        <div class="scpace-t">
+            <input type='button' id='runBtn' class="btn btn--run  shake" value='抽🔥'>
+        </div>`;
+
+                //console.log(input.files[0]);
+                console.log(kind_name);
+                console.log(window['gData'][kind_name]);
+                var names = new Array();
+                var step = 0;
+                for (var i = 1, max_i = window['gData'][kind_name].length; i < max_i; i++) {
+                    if (window['gData'][kind_name][i]["姓名"] == null) continue;
+                    names.push(window['gData'][kind_name][i]["姓名"]);
+                    if (step != 0 && step % 5 == 0) {
+                        names[names.length - 1] = "\n" + names[names.length - 1];
+                    }
+                    step++;
+                }
+                // html = html.replace("{members}", implode(",", names.map(name => ('💩' + name))));
+                $("#step3").html(html).fadeIn();
+
+                const personsEls = names.map(function (name) {
+                    //console.log(colShake$DOM());
+                    //console.log(personBadge$DOM(name));
+                    var _data = colShake$DOM().append(personBadge$DOM(name));
+                    return _data;
+                })
+                $('#personBlock').append(personsEls)
+                $('#personBlock').data({ persons: names })
+
+
+                //抖動外框
+                focus_border($("span[reqc='emoji_span']"));
+
+                // 按下抽
+                // 名單從 textarea #memberTextarea 取得，移除所有 \n，用 , 分格，打亂 array，作抽獎效果
+                $("#runBtn").unbind("click").click({ kind_name: kind_name }, function (e) {
+                    clearInterval(window['runInterval']);
+                    clearTimeout(window['time_down_func_' + window['tButtonInterval'] + '_timeout']);
+                    window['lastKindIndex'] = e.data.kind_name;
+                    // var membersArr = $("#memberTextarea").val().replace("\n", "").split(",");
+                    var membersArr = $('#personBlock').data().persons;
+                    membersArr = shuffle(membersArr); //打亂
+                    var m = new Array();
+                    for (var i = 0, max_i = membersArr.length; i < max_i; i++) {
+                        // var d = "<div class='randomDivs'>" + membersArr[i] + "</div>";
+                        var d = `<div class="col-auto"><span class="randomDivs badge badge--person-startle">${membersArr[i]}</span></div>`
+                        m.push(d);
+                    }
+                    // var html = implode("", m);
+                    var html = implode("", `<div class="row g-2">${m.join('')}</div>`);
+                    html += "<input type='button' class='btn' style='position:absolute;right:30px;bottom:30px;' id='timedownBtn'>";
+                    dialogMyBoxOn(html, true, function () {
+                        //加個 min width、min height
+                        $("div[id^='mybox_div']").css({
+                            'min-width': '400px',
+                            'min-height': '600px'
+                        });
+                        window['runInterval'] = setInterval(function () {
+                            // 隨機人名框選開始作動
+                            // $(".randomDivs").removeClass("focusRandom");
+                            $(".randomDivs").removeClass("badge--focus");
+                            // $(".randomDivs").eq(rand(0, $(".randomDivs").length - 1)).addClass("focusRandom");
+                            $(".randomDivs").eq(rand(0, $(".randomDivs").length - 1)).addClass("badge--focus");
+                        }, 30);
+
+                        //timedownbutton(button_dom, title, seconds, done_func) {
+                        //倒數計時關閉按鈕
+                        window['tButtonInterval'] = timedownbutton("#timedownBtn", "倒數中", 8, function () {
+                            //時間到
+                            clearInterval(window['runInterval']);
+                            setTimeout(function () {
+                                //把贏的抓出來，全螢幕
+                                // window['winName'] = $(".focusRandom").text();
+                                window['winName'] = $(".badge--focus").text();
+                                var html = "<div class='badge badge--person-shit badge--xl badge--shadow rotate-6'>" + window['winName'] + "</div>";
+                                dialogMyBoxOn(html, true, function () {
+                                    // 背景
+                                    const $mybox_background = $("div[id^='mybox_background']")
+
+                                    $mybox_background.css({
+                                        'background-color': 'rgba(0,0,0,.95)',
+                                        'opacity': 1
+                                    })
+                                    // 背景附加煙火特效
+                                    const fireworks = new FireworksClass(
+                                        $mybox_background.get(0),
+                                        {
+                                            delay: {
+                                                min: 10,
+                                                max: 15
+                                            },
+                                            opacity: .2,
+                                            sound: {
+                                                enabled: true,
+                                                files: [window['mp3_b64_explosion0'], window['mp3_b64_explosion1'], window['mp3_b64_explosion2']],
+                                                volume: {
+                                                    min: 50, max: 100
+                                                }
+                                            }
+                                        }
+                                    )
+                                    function fireworksRemove() {
+                                        // 停止煙火(如果沒有stop音效還會繼續播放)
+                                        fireworks.stop();
+                                        // 清除煙火實例
+                                        fireworks.clear();
+
+                                    }
+                                    // 放煙火
+                                    fireworks.start();
+                                    // 背景click關閉清除煙火實例
+                                    $mybox_background.on('click', fireworksRemove)
+
+                                    // 光箱出現後
+                                    $("div[id^='mybox_div']").css({
+                                        'background-color': 'transparent',
+                                        'padding': '60px',
+                                        'border': '0px'
+                                    });
+                                    setTimeout(function () {
+                                        //把中獎名寫回
+                                        console.log(window['lastKindIndex']);
+                                        var orin_value = $("input[reqc='sheetNames'][req_sheetname='" + window['lastKindIndex'] + "']").attr('orin_value');
+                                        $("input[reqc='sheetNames'][req_sheetname='" + window['lastKindIndex'] + "']").val(orin_value + "(" + "💩" + window['winName'] + ")");
+                                        fireworksRemove()
+                                        dialogMyBoxOff();
+                                        $mybox_background.off('click')
+                                    }, 6000);
+                                });
+                            }, 500);
+                        });
+                    }, function () {
+                        //如果臨時點旁邊關掉光箱
+                        clearTimeout(window['time_down_func_' + window['tButtonInterval'] + '_timeout']);
+                        clearInterval(window['runInterval']);
+                    });
+                });
+
+
+            }
+            );
+        }
+    });
+</script>
+</html>

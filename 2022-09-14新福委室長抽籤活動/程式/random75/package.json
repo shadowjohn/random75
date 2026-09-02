@@ -11,7 +11,7 @@
     "height": 800
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.9.10",
+    "@xmldom/xmldom": "^0.9.12",
     "fireworks-js": "^2.0.2",
     "read-excel-file": "^6.0.3"
   }
